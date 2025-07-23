@@ -1,0 +1,47 @@
+<!-- status.html - İşlem durumu görselleştirme sayfası -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>İşlem Durumu</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #progress-bar { width: 100%; height: 20px; background: #f0f0f0; }
+        #progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.5s; }
+        .error { color: red; }
+        .repo-url { margin-top: 10px; }
+    </style>
+    <script>
+        function updateStatus(uid) {
+            fetch('/status/' + uid)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('status').innerText = `Durum: ${data.stage || 'Bilinmiyor'}`;
+                    document.getElementById('progress-fill').style.width = `${data.progress || 0}%`;
+                    document.getElementById('message').innerText = `Mesaj: ${data.message || ''}`;
+                    document.getElementById('error').innerText = data.error ? `Hata: ${data.error}` : '';
+                    if (data.stage === 'completed' && data.message.includes('GitHub Desktop')) {
+                        document.getElementById('repo-url').innerHTML = `Repository: <a href="${data.message.split('(')[1].split(')')[0]}" target="_blank">${data.message.split('(')[1].split(')')[0]}</a>`;
+                    }
+                    if (data.stage !== 'completed' && !data.error) {
+                        setTimeout(() => updateStatus(uid), 1000);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('error').innerText = `Hata: Durum alınamadı (${error})`;
+                });
+        }
+    </script>
+</head>
+<body onload="updateStatus('{{ uid }}')">
+    <h1>İşlem Durumu</h1>
+    <p id="status">Durum: {{ initial_status.stage | default('Yükleniyor') }}</p>
+    <div id="progress-bar">
+        <div id="progress-fill" style="width: {{ initial_status.progress | default(0) }}%;"></div>
+    </div>
+    <p id="message">Mesaj: {{ initial_status.message | default('') }}</p>
+    <p id="repo-url" class="repo-url"></p>
+    <p id="error" class="error">{{ initial_status.error | default('') }}</p>
+    <a href="/">Ana Sayfaya Dön</a>
+</body>
+</html>
