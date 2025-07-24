@@ -1,36 +1,3 @@
-# README.md - Güncellenmiş Python GUI Tabanlı SVS Dönüştürme ve GitHub Entegrasyonu Uygulaması
-
-Bu README, kullanıcının isteği doğrultusunda güncellenmiş bir Python GUI (görsel arayüz) uygulamasının tam kodlarını ve yapılandırma dosyalarını içerir. Uygulama, `.svs` formatındaki patoloji slayt dosyalarını vips dzsave ile hızlıca DZI formatına dönüştürür, HTML görüntüleyici ekler, blog benzeri yazı/resim ekleme imkanı verir, yerel Git repository'lerine kaydeder ve GitHub Desktop ile push edilmesini sağlar. Çoklu repository desteği (`gallery-01`, `gallery-02`, vb.) ile GitHub Organizations ücretsiz planının 500 MB sınırına uyumlu hale getirilmiştir. Ana galeri repository'si (`galeri`) tüm slaytları JSON ile toplar ve index.html oluşturur. HTML düzenleme için basit bir görsel editör eklendi. Slayt repolarına README eklenir.
-
-## Kurulum Talimatları
-1. **Gerekli Kütüphaneler**:
-   ```
-   pip install pyvips gitpython tkinter
-   ```
-   - **libvips Yüklemesi (Windows için)**: [libvips binary'lerini indirin](https://libvips.github.io/libvips/install.html) (ör. vips-dev-8.15-win64.zip) ve çıkarın. `bin` dizinini PATH'e ekleyin:
-     ```
-     setx PATH "%PATH%;C:\vips-dev-8.15\bin"
-     ```
-     - Yeniden başlatın ve `vips --version` komutunu CMD'de test edin.
-   - Git: Zaten yüklü (GitHub Desktop ile).
-2. **GitHub Repository'lerini Hazırlayın**:
-   - Ana galeri: https://github.com/metinciris/galeri (klonlanmış: `C:\slide-uploader\repos\galeri`).
-   - Slayt repoları: `gallery-01`, `gallery-02`, vb. (klonlanmış: `C:\slide-uploader\repos\gallery-01`).
-   - Her slayt repo'su için GitHub Pages'i etkinleştirin (`Settings -> Pages -> Source: main`).
-3. **GitHub Desktop**:
-   - Zaten yüklü ve repolar klonlanmış. Yeni repoları klonlamak için `File -> Clone Repository` kullanın.
-4. **Uygulamayı Çalıştırma**:
-   ```
-   cd C:\slide-uploader
-   python main.py
-   ```
-   - GUI açılacak, SVS dosyasını seçin, açıklama/blog/resim ekleyin ve "Dönüştür ve Commit Et" butonuna tıklayın.
-
-## Dosya İçerikleri
-Aşağıda, uygulamanın tüm dosyalarının içerikleri verilmiştir. Her dosyanın başına dosya adı ve kısa bir açıklama eklenmiştir.
-
-### main.py - Ana Python GUI uygulaması (SVS dönüştürme, Git commit ve galeri güncelleme)
-```python
 # main.py - Ana Python GUI uygulaması (SVS dönüştürme, Git commit ve galeri güncelleme)
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk, scrolledtext
@@ -67,7 +34,9 @@ def get_available_repos():
     repos = []
     for folder in os.listdir(LOCAL_REPO_BASE):
         if folder.startswith("gallery-"):
-            repos.append(folder)
+            repo_path = os.path.join(LOCAL_REPO_BASE, folder)
+            if os.path.exists(os.path.join(repo_path, ".git")):
+                repos.append(folder)
     return repos
 
 def get_current_repo(available_repos):
@@ -84,7 +53,6 @@ def get_current_repo(available_repos):
         )
         if total_size < max_size:
             return repo_name
-    # Yeni repo ekleme (manuel olarak eklenmesi için uyarı ver)
     messagebox.showwarning("Uyarı", "Tüm repolar dolu. Yeni repo ekleyin ve listeyi yenileyin.")
     return None
 
@@ -94,12 +62,10 @@ def convert_svs_to_dzi(svs_path, outdir, uid, progress_callback):
         progress_callback(10, "SVS dosyası açılıyor")
         image = pyvips.Image.new_from_file(svs_path, access='sequential')
         
-        # vips dzsave ile DZI oluştur
         progress_callback(20, "DZI dosyası ve karolar oluşturuluyor (10 bin karo bekleniyor)")
-        image.dzsave(outdir, layout='dz', suffix='.jpeg[Q=80]', overlap=1, tile_size=256, depth='onepixel')
+        image.dzsave(outdir, layout='dz', suffix='.jpeg[Q=80]', overlap=1, tile_size=256, depth='one')
         logger.info(f"DZI ve karolar oluşturuldu: {outdir}")
 
-        # Görüntüleyici HTML oluştur
         progress_callback(90, "Görüntüleyici HTML oluşturuluyor")
         viewer_html = """<!DOCTYPE html>
 <html lang="tr">
@@ -135,7 +101,7 @@ def convert_svs_to_dzi(svs_path, outdir, uid, progress_callback):
         progress_callback(100, "Dönüştürme tamamlandı")
         return True
     except Exception as e:
-        logger.error(f"SVS dönüştürme hatası: {e}")
+        logger.error(f"SVS dönüştürme hatası: {str(e)}")
         return False
 
 def upload_to_gallery_repo(outdir, description, uid, blog_text, blog_image_path, repo_name, progress_callback):
@@ -144,6 +110,14 @@ def upload_to_gallery_repo(outdir, description, uid, blog_text, blog_image_path,
         progress_callback(0, f"Yerel Git repository'si hazırlanıyor: {repo_name}")
         repo_path = os.path.join(LOCAL_REPO_BASE, repo_name)
         slide_dir = os.path.join(repo_path, "slides", uid)
+        
+        # Repository var mı kontrol et, yoksa başlat
+        if not os.path.exists(os.path.join(repo_path, ".git")):
+            logger.info(f"Git repository'si bulunamadı, yeni başlatılıyor: {repo_path}")
+            repo = git.Repo.init(repo_path)
+            repo.create_remote("origin", f"https://github.com/{GITHUB_USER}/{repo_name}.git")
+        else:
+            repo = git.Repo(repo_path)
         
         # Slayt dosyalarını kopyala
         progress_callback(10, "Dosyalar repository'ye kopyalanıyor")
@@ -164,7 +138,7 @@ def upload_to_gallery_repo(outdir, description, uid, blog_text, blog_image_path,
         
         # README oluştur (page linki ile)
         progress_callback(40, "README oluşturuluyor")
-        readme_content = f"# Slayt {uid}\n\nAçıklama: {description}\n\nPage Linki: https://metinciris.github.io/{repo_name}/slides/{uid}/\n\nBlog Metni:\n{blog_text}\n"
+        readme_content = f"# Slayt {uid}\n\nAçıklama: {description}\n\nPage Linki: https://{GITHUB_USER}.github.io/{repo_name}/slides/{uid}/\n\nBlog Metni:\n{blog_text}\n"
         readme_path = os.path.join(slide_dir, "README.md")
         with open(readme_path, "w", encoding="utf-8") as f:
             f.write(readme_content)
@@ -217,7 +191,7 @@ def upload_to_gallery_repo(outdir, description, uid, blog_text, blog_image_path,
         progress_callback(100, f"Repository hazır: GitHub Desktop ile push edin (https://github.com/{GITHUB_USER}/{repo_name}.git)")
         return True
     except Exception as e:
-        logger.error(f"Yerel Git hatası: {e}")
+        logger.error(f"Yerel Git hatası: {str(e)}")
         return False
 
 def update_main_galeri_repo():
@@ -278,18 +252,16 @@ def update_main_galeri_repo():
         
         return True
     except Exception as e:
-        logger.error(f"Ana galeri güncelleme hatası: {e}")
+        logger.error(f"Ana galeri güncelleme hatası: {str(e)}")
         return False
 
 def cleanup_files(svs_path, outdir):
-    """Yerel dosyaları temizle."""
+    """Yerel dosyaları temizle (orijinal SVS silinmesin)."""
     try:
         shutil.rmtree(outdir, ignore_errors=True)
-        if os.path.exists(svs_path):
-            os.remove(svs_path)
-        logger.info(f"Yerel dosyalar temizlendi: {svs_path}, {outdir}")
+        logger.info(f"Yerel dosyalar temizlendi: {svs_path}, {outdir} (SVS silinmedi)")
     except Exception as e:
-        logger.error(f"Temizlik hatası: {e}")
+        logger.error(f"Temizlik hatası: {str(e)}")
 
 def edit_html(repo_name):
     """Belirtilen repo'nun index.html dosyasını görsel editör ile düzenle."""
@@ -321,7 +293,7 @@ def edit_html(repo_name):
 def main_gui():
     root = tk.Tk()
     root.title("SVS Dönüştürme ve GitHub Entegrasyonu")
-    root.geometry("600x600")
+    root.geometry("600x700")
 
     # Scrollable frame ekle (en alt tuş gözüksün)
     canvas = tk.Canvas(root)
@@ -399,19 +371,16 @@ def main_gui():
             status_label.config(text=msg)
             root.update_idletasks()
         
-        # Dönüştürme
         if not convert_svs_to_dzi(svs_path, outdir, uid, progress_callback):
             cleanup_files(svs_path, outdir)
             messagebox.showerror("Hata", "Dönüştürme başarısız. app.log kontrol edin.")
             return
         
-        # Gallery repo'ya ekle
         if not upload_to_gallery_repo(outdir, description, uid, blog_text, blog_image_path, repo_name, progress_callback):
             cleanup_files(svs_path, outdir)
             messagebox.showerror("Hata", "Gallery repo'ya ekleme başarısız. app.log kontrol edin.")
             return
         
-        # Ana galeri repo'yu güncelle
         if not update_main_galeri_repo():
             messagebox.showwarning("Uyarı", "Ana galeri güncellenemedi, manuel kontrol edin.")
         
@@ -428,8 +397,108 @@ if __name__ == "__main__":
     main_gui()
 ```
 
-### app.log - Uygulama günlük kaydı dosyası (otomatik oluşturulur)
-- Bu dosya, uygulama çalıştığında otomatik oluşturulur ve hatalar/loglar burada saklanır. Manuel oluşturmanıza gerek yok.
+### index.html - Ana galeri sayfası
+```html
+<!-- index.html - Ana galeri sayfası -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sanal Mikroskop Galerisi</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin: 10px 0; }
+        .form-container { margin-top: 20px; }
+    </style>
+    <script>
+        function startUpload(event) {
+            const uid = 'uid-' + new Date().getTime();
+            document.getElementById('uid').value = uid;
+            setTimeout(() => {
+                window.location.href = '/status/' + uid + '/view';
+            }, 1000);
+        }
+    </script>
+</head>
+<body>
+    <h1>Sanal Mikroskop Slaytları</h1>
+    <ul>
+        {% for item in gallery %}
+        <li>
+            <a href="{{ item.url }}" target="_blank">{{ item.title }}</a> – {{ item.description }}
+            (<a href="https://github.com/{{ GITHUB_USER }}/{{ item.repo }}/tree/main/slides/{{ item.uid }}" target="_blank">Depo</a>)
+            <form action="/rename/{{ item.uid }}" method="post" style="display:inline;">
+                <input type="text" name="newname" placeholder="Yeni başlık">
+                <button type="submit">Yeniden Adlandır</button>
+            </form>
+            <a href="/delete/{{ item.uid }}">Sil</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <div class="form-container">
+        <form action="/upload" method="post" enctype="multipart/form-data" onsubmit="startUpload(event)">
+            <input type="file" name="file" accept=".svs" required>
+            <input type="text" name="description" placeholder="Slayt açıklaması">
+            <input type="hidden" id="uid" name="uid" value="">
+            <button type="submit">Yükle</button>
+        </form>
+        <p>Yükleme tamamlandıktan sonra, GitHub Desktop ile uygun gallery repository'sini push edin. Durum sayfasında talimatları ve repository URL'sini bulabilirsiniz.</p>
+    </div>
+</body>
+</html>
+```
+
+### status.html - İşlem durumu görselleştirme sayfası
+```html
+<!-- status.html - İşlem durumu görselleştirme sayfası -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>İşlem Durumu</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #progress-bar { width: 100%; height: 20px; background: #f0f0f0; }
+        #progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.5s; }
+        .error { color: red; }
+        .repo-url { margin-top: 10px; }
+    </style>
+    <script>
+        function updateStatus(uid) {
+            fetch('/status/' + uid)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('status').innerText = `Durum: ${data.stage || 'Bilinmiyor'}`;
+                    document.getElementById('progress-fill').style.width = `${data.progress || 0}%`;
+                    document.getElementById('message').innerText = `Mesaj: ${data.message || ''}`;
+                    document.getElementById('error').innerText = data.error ? `Hata: ${data.error}` : '';
+                    if (data.stage === 'completed' && data.message.includes('GitHub Desktop')) {
+                        document.getElementById('repo-url').innerHTML = `Repository: <a href="${data.message.split('(')[1].split(')')[0]}" target="_blank">${data.message.split('(')[1].split(')')[0]}</a>`;
+                    }
+                    if (data.stage !== 'completed' && !data.error) {
+                        setTimeout(() => updateStatus(uid), 1000);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('error').innerText = `Hata: Durum alınamadı (${error})`;
+                });
+        }
+    </script>
+</head>
+<body onload="updateStatus('{{ uid }}')">
+    <h1>İşlem Durumu</h1>
+    <p id="status">Durum: {{ initial_status.stage | default('Yükleniyor') }}</p>
+    <div id="progress-bar">
+        <div id="progress-fill" style="width: {{ initial_status.progress | default(0) }}%;"></div>
+    </div>
+    <p id="message">Mesaj: {{ initial_status.message | default('') }}</p>
+    <p id="repo-url" class="repo-url"></p>
+    <p id="error" class="error">{{ initial_status.error | default('') }}</p>
+    <a href="/">Ana Sayfaya Dön</a>
+</body>
+</html>
+```
 
 ### .env - Ortam değişkenleri yapılandırma dosyası
 ```
@@ -466,7 +535,7 @@ LOCAL_REPO_BASE=repos
    - Blog metni `slides/<uid>/blog.txt` olarak, resim ise orijinal adı ile kaydedilir.
    - README.md, page linki ile otomatik oluşturulur.
 7. **HTML Düzenleme**:
-   - "Ana Galeri HTML Düzenle" butonu ile `galeri/index.html` dosyasını görsel olarak düzenleyin (metin alanı ile kaydedin).
+   - "Ana Galeri HTML Düzenle" butonu ile `galeri/index.html` dosyasını açar ve kaydedilir.
 8. **Güvenlik ve Yedekleme**:
    - Elektrik kesintisi için, try-except blokları dosyaları siler.
    - Başarılı işlemleri `app.log` veya GUI mesajından takip edin.
@@ -478,4 +547,4 @@ LOCAL_REPO_BASE=repos
 - **Log Kontrolü**: `C:\slide-uploader\app.log` dosyasını açın, hataları inceleyin.
 - **Tuş Gözükmüyor**: Scrollable frame eklendi, pencereyi kaydırın.
 
-Eğer ek özellik (ör. otomatik push, blog linki otomatik ekleme) isterseniz, belirtin!
+Eğer ek özellik (ör. otomatik push, blog linki otomatik ekleme) isterseniz, belirtin!****
