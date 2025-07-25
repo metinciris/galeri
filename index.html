@@ -1,48 +1,14 @@
-<!-- index.html - Ana galeri sayfası -->
+
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sanal Mikroskop Galerisi</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        ul { list-style-type: none; padding: 0; }
-        li { margin: 10px 0; }
-        .form-container { margin-top: 20px; }
-    </style>
-    <script>
-        function startUpload(event) {
-            const uid = 'uid-' + new Date().getTime();
-            document.getElementById('uid').value = uid;
-            setTimeout(() => {
-                window.location.href = '/status/' + uid + '/view';
-            }, 1000);
-        }
-    </script>
+    <title>Slide Gallery</title>
 </head>
 <body>
-    <h1>Sanal Mikroskop Slaytları</h1>
+    <h1>Slide Gallery</h1>
     <ul>
-        {% for item in gallery %}
-        <li>
-            <a href="{{ item.url }}" target="_blank">{{ item.title }}</a> – {{ item.description }}
-            (<a href="https://github.com/{{ GITHUB_USER }}/{{ item.repo }}/tree/main/slides/{{ item.uid }}" target="_blank">Depo</a>)
-            <form action="/rename/{{ item.uid }}" method="post" style="display:inline;">
-                <input type="text" name="newname" placeholder="Yeni başlık">
-                <button type="submit">Yeniden Adlandır</button>
-            </form>
-            <a href="/delete/{{ item.uid }}">Sil</a>
-        </li>
-        {% endfor %}
     </ul>
-    <div class="form-container">
-        <form action="/upload" method="post" enctype="multipart/form-data" onsubmit="startUpload(event)">
-            <input type="file" name="file" accept=".svs" required>
-            <input type="text" name="description" placeholder="Slayt açıklaması">
-            <input type="hidden" id="uid" name="uid" value="">
-            <button type="submit">Yükle</button>
-        </form>
-        <p>Yükleme tamamlandıktan sonra, GitHub Desktop ile uygun gallery repository'sini push edin. Durum sayfasında talimatları ve repository URL'sini bulabilirsiniz.</p>
-    </div>
 </body>
 </html>
+        
