@@ -1,5 +1,5 @@
 
-[https://metinciris.github.io/gallery-01/](https://metinciris.github.io/galeri/) Ana galeri
+[Ana galeri Sayfası](https://metinciris.github.io/galeri/) Ana galeri
 
 Örnek:
 
