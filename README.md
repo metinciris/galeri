@@ -129,3 +129,4 @@ Tüm işlemler, try-except blokları ile korunur; hata olursa geçici dosyalar s
 8. **Genel Hata**: `app.log` dosyasını inceleyin; tam hata mesajları orada.
 
 Eğer bu çözüm çalışmazsa veya log paylaşırız, daha fazla yardımcı olabilirim.
+- [Serrated adenom](https://metinciris.github.io/gallery-01/) - Traditional Serrated Adenom ![Thumbnail](https://metinciris.github.io/gallery-01/thumbnail.jpg)
