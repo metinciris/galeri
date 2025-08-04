@@ -22,6 +22,9 @@ View the live gallery at [https://metinciris.github.io/galeri/](https://metincir
 - [**gallery-05**](https://metinciris.github.io/gallery-05/) -   
   
 
+- [**gallery-06**](https://metinciris.github.io/gallery-06/) -   
+  
+
 
 
 ## How to Use
@@ -29,5 +32,5 @@ View the live gallery at [https://metinciris.github.io/galeri/](https://metincir
 - Each slide is hosted in its own repository (named `gallery-*`).
 - This README is auto-updated whenever the gallery changes.
 
-Updated automatically on 2025-08-01 18:54:03.
+Updated automatically on 2025-08-04 13:12:06.
     
