@@ -10,3 +10,4 @@
 - [gallery-08](https://metinciris.github.io/gallery-08/) - # Tiroglobulin, Cribriform-morular thyroid carcinoma Tiroglobulin negatifliği olan tiroid tümörü
 - [gallery-09](https://metinciris.github.io/gallery-09/) - # Cribriform-morular thyroid carcinoma, ikinci odak ile birlikte Çok sayıda odak içeren tümörde iki ayrı tümör odağı
 - [gallery-10](https://metinciris.github.io/gallery-10/) - # Beta-Catenin pozitifliği, Cribriform-morular thyroid carcinoma Beta-Catenin nükleer ve sitoplazmik pozitiflik.
+- [gallery-11](https://metinciris.github.io/gallery-11/) - # ER pozitifliği, Cribriform-morular thyroid carcinoma ER hormon reseptöründe yaygın pozitiflik. Tiroid için beklenmeyen özellik.
