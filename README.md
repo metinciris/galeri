@@ -14,5 +14,5 @@ View the live gallery at [https://metinciris.github.io/galeri/](https://metincir
 - Each slide is hosted in its own repository (named `gallery-*`).
 - This README is auto-updated whenever the gallery changes.
 
-Updated automatically on 2025-11-10 16:05:01.
+Updated automatically on 2025-11-27 16:18:30.
     
