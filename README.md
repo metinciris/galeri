@@ -1,4 +1,6 @@
-# Slide Gallery
+# Slide Gallery 🎨
+
+Interactive whole-slide microscopy gallery.
 
 Live gallery: https://metinciris.github.io/galeri/
 
@@ -93,4 +95,4 @@ Live gallery: https://metinciris.github.io/galeri/
 - [**Metanefrik adenom PAX8**](https://metinciris.github.io/gallery-044/) - Böbrek Metanefrik adenom PAX8 pozitifliği
 
 ---
-Updated automatically on 2026-08-19 15:55:20.
+Updated automatically on 2026-08-19 16:10:46.
