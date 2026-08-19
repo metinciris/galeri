@@ -1,6 +1,4 @@
-# Slide Gallery 🎨
-
-Interactive whole-slide microscopy gallery.
+# Slide Gallery
 
 Live gallery: https://metinciris.github.io/galeri/
 
@@ -88,5 +86,11 @@ Live gallery: https://metinciris.github.io/galeri/
 
 - [**40**](https://metinciris.github.io/gallery-40/) - Ureter cyst Üreter kisti
 
+- [**Metanefrik adenom**](https://metinciris.github.io/gallery-042/) - Böbrek Metanefrik adenom
+
+- [**Metanefrik adenom CD57**](https://metinciris.github.io/gallery-043/) - Böbrek Metanefrik adenom CD57 pozitifliği
+
+- [**Metanefrik adenom PAX8**](https://metinciris.github.io/gallery-044/) - Böbrek Metanefrik adenom PAX8 pozitifliği
+
 ---
-Updated automatically on 2026-08-19 15:01:20.
+Updated automatically on 2026-08-19 15:55:20.
