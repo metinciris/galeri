@@ -94,5 +94,7 @@ Live gallery: https://metinciris.github.io/galeri/
 
 - [**Metanefrik adenom PAX8**](https://metinciris.github.io/gallery-044/) - Böbrek Metanefrik adenom PAX8 pozitifliği
 
+- [**Prostat adenokarsinomu**](https://metinciris.github.io/gallery-045/) - HE ve Pin kokteyl boyaması (p63+AMACR)
+
 ---
-Updated automatically on 2026-08-19 16:19:01.
+Updated automatically on 2026-08-20 14:47:27.
