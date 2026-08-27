@@ -96,5 +96,7 @@ Live gallery: https://metinciris.github.io/galeri/
 
 - [**Prostat adenokarsinomu**](https://metinciris.github.io/gallery-045/) - HE ve Pin kokteyl boyaması (p63+AMACR)
 
+- [**adenoid kistik karsinom**](https://metinciris.github.io/gallery-046/) - Parotis iyi diferansiye adenoid kistik karsinom
+
 ---
-Updated automatically on 2026-08-20 14:47:27.
+Updated automatically on 2026-08-27 10:44:10.
