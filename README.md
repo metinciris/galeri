@@ -101,4 +101,4 @@ Live gallery: https://metinciris.github.io/galeri/
 - [**Dermal nöronal tümör**](https://metinciris.github.io/gallery-047/) - Dermis yerleşimli nöronal özellikte tümör
 
 ---
-Updated automatically on 2026-08-31 15:06:42.
+Updated automatically on 2026-08-31 15:10:56.
